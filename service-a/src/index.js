@@ -2,6 +2,8 @@ const express = require('express')
 const axios = require('axios')
 const Queue = require('bull')
 
+require('./open-telemetry')
+
 const app = express()
 
 const PORT = process.env.PORT ?? 3000

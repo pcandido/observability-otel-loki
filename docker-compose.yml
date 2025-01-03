@@ -35,6 +35,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - QUEUE_NAME=service-c-queue
+      - OTEL_COLLECTOR_URL=http://otel-collector:4317
 
   service-b:
     build: ./service-b
@@ -44,6 +45,7 @@ services:
       - default
     environment:
       - PORT=3000
+      - OTEL_COLLECTOR_URL=http://otel-collector:4317
 
   service-c:
     build: ./service-c
@@ -55,3 +57,46 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - QUEUE_NAME=service-c-queue
+      - OTEL_COLLECTOR_URL=http://otel-collector:4317
+
+  otel-collector:
+    image: otel/opentelemetry-collector
+    container_name: otel-collector
+    networks:
+      - default
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./open-telemetry/otel-collector-config.yml:/etc/otel-collector-config.yml:ro
+    depends_on:
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: jaeger
+    networks:
+      - default
+    ports:
+      - 8082:16686 # Jaeger UI
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    networks:
+      - default
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    networks:
+      - default
+    ports:
+      - 8081:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
