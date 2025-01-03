@@ -2,6 +2,18 @@ networks:
   default:
 
 services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - 8080:80
+    networks:
+      - default
+    depends_on:
+      - service-a
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+
   redis:
     image: redis
     container_name: redis
@@ -12,8 +24,6 @@ services:
     build: ./service-a
     image: service-a
     container_name: service-a
-    ports:
-      - 3000:3000
     networks:
       - default
     depends_on:
