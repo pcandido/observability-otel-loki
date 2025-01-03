@@ -1,0 +1,20 @@
+{
+  "name": "service-c",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.55.0",
+    "@opentelemetry/sdk-node": "^0.57.0",
+    "bull": "^4.16.5",
+    "express": "^4.21.2",
+    "ioredis": "^5.4.2"
+  }
+}
