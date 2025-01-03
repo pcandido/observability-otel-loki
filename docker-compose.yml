@@ -1,0 +1,47 @@
+networks:
+  default:
+
+services:
+  redis:
+    image: redis
+    container_name: redis
+    networks:
+      - default
+
+  service-a:
+    build: ./service-a
+    image: service-a
+    container_name: service-a
+    ports:
+      - 3000:3000
+    networks:
+      - default
+    depends_on:
+      - service-b
+      - service-c
+    environment:
+      - PORT=3000
+      - SERVICE_B_URL=http://service-b:3000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_NAME=service-c-queue
+
+  service-b:
+    build: ./service-b
+    image: service-b
+    container_name: service-b
+    networks:
+      - default
+    environment:
+      - PORT=3000
+
+  service-c:
+    build: ./service-c
+    image: service-c
+    container_name: service-c
+    networks:
+      - default
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_NAME=service-c-queue
