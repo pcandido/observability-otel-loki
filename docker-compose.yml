@@ -35,7 +35,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - QUEUE_NAME=service-c-queue
-      - OTEL_COLLECTOR_URL=http://otel-collector:4317
+      - OTEL_COLLECTOR_URL=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=service-a
 
   service-b:
     build: ./service-b
@@ -45,7 +46,8 @@ services:
       - default
     environment:
       - PORT=3000
-      - OTEL_COLLECTOR_URL=http://otel-collector:4317
+      - OTEL_COLLECTOR_URL=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=service-b
 
   service-c:
     build: ./service-c
@@ -57,7 +59,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - QUEUE_NAME=service-c-queue
-      - OTEL_COLLECTOR_URL=http://otel-collector:4317
+      - OTEL_COLLECTOR_URL=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=service-c
 
   otel-collector:
     image: otel/opentelemetry-collector
