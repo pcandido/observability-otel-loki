@@ -1,4 +1,5 @@
 const Queue = require('bull')
+const logger = require('./logger')
 
 require('./open-telemetry')
 
@@ -11,12 +12,12 @@ const queue = new Queue(queueName, {
 })
 
 queue.process(async (job) => {
-  console.log('Processing job:', job.data)
+  logger.info('Processing job:', job.data)
 
   const sleepTime = job.data.sleepTime ?? 0
   await new Promise((resolve) => setTimeout(resolve, sleepTime))
 
-  console.log('Job completed:', job.data)
+  logger.info('Job completed:', job.data)
 })
 
-console.log(`Service C listening to queue ${queueName} at redis://${redisHost}:${redisPort}`)
+logger.info(`Service C listening to queue ${queueName} at redis://${redisHost}:${redisPort}`)

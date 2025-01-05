@@ -1,6 +1,7 @@
 const express = require('express')
 const axios = require('axios')
 const Queue = require('bull')
+const logger = require('./logger')
 
 require('./open-telemetry')
 
@@ -18,7 +19,7 @@ const serviceCQueue = new Queue(queueName, {
 
 app.get('/', async (req, res) => {
   try {
-    console.log('Service A processing request...')
+    logger.info('Service A processing request...')
 
     const serviceASleepTime = parseInt(req.query.service_a_sleep_time) || 0
     const serviceBSleepTime = parseInt(req.query.service_b_sleep_time) || 0
@@ -28,22 +29,22 @@ app.get('/', async (req, res) => {
       await new Promise(res => setTimeout(res, serviceASleepTime))
     }
 
-    console.log('Calling Service B...')
+    logger.info('Calling Service B...')
     const responseB = await axios.get(serviceBUrl, {
       params: { sleepTime: serviceBSleepTime },
     })
-    console.log('Response from Service B:', responseB.data)
+    logger.info('Response from Service B:', responseB.data)
 
-    console.log('Adding job to Service C queue...')
+    logger.info('Adding job to Service C queue', { number: responseB.data.number })
     await serviceCQueue.add({ number: responseB.data.number, sleepTime: serviceCSleepTime })
 
     res.send({ message: 'Service A completed request' })
   } catch (error) {
-    console.error('Error in Service A:', error)
+    logger.error('Error in Service A:', error)
     res.status(500).send({ error: 'Something went wrong' })
   }
 })
 
 app.listen(PORT, () => {
-  console.log(`Service A running at http://localhost:${PORT}`)
+  logger.info(`Service A running at http://localhost:${PORT}`)
 })

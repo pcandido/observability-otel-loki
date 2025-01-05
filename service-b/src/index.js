@@ -1,4 +1,6 @@
 const express = require('express')
+const logger = require('./logger')
+
 const app = express()
 
 require('./open-telemetry')
@@ -6,7 +8,7 @@ require('./open-telemetry')
 const PORT = process.env.PORT ?? 3001
 
 app.get('/', async (req, res) => {
-  console.log('Service B processing request...')
+  logger.info('Service B processing request')
 
   const sleepTime = req.query.sleepTime ?? 0
   await new Promise(res => setTimeout(res, sleepTime))
@@ -16,5 +18,5 @@ app.get('/', async (req, res) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`Service B running at http://localhost:${PORT}`)
+  logger.info(`Service B running at http://localhost:${PORT}`)
 })

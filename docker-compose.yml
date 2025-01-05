@@ -89,6 +89,28 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
+  loki:
+    image: grafana/loki
+    container_name: loki
+    networks:
+      - default
+    command: -config.file=/etc/loki/local-config.yml
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yml
+
+  promtail:
+    image: grafana/promtail
+    container_name: promtail
+    networks:
+      - default
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml
+    command:
+      - -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -103,3 +125,5 @@ services:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
     depends_on:
       - prometheus
+      - jaeger
+      - loki

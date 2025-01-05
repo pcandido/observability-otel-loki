@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    basicAuth: false
+    isDefault: false
+    editable: true
+    jsonData:
+      derivedFields:
+        - datasourceUid: Jaeger
+          matcherRegex: "\"trace_id\":\"([a-f0-9]{16,32})\""
+          name: TraceID
+          url: '$${__value.raw}'
+          urlDisplayLabel: 'View Trace'
