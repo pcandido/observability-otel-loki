@@ -28,7 +28,9 @@ services:
       - default
     depends_on:
       - service-b
-      - service-c
+      - redis
+      - otel-collector
+      - promtail
     environment:
       - PORT=3000
       - SERVICE_B_URL=http://service-b:3000
@@ -42,6 +44,9 @@ services:
     build: ./service-b
     image: service-b
     container_name: service-b
+    depends_on:
+      - otel-collector
+      - promtail
     networks:
       - default
     environment:
@@ -53,6 +58,10 @@ services:
     build: ./service-c
     image: service-c
     container_name: service-c
+    depends_on:
+      - redis
+      - otel-collector
+      - promtail
     networks:
       - default
     environment:
@@ -65,13 +74,13 @@ services:
   otel-collector:
     image: otel/opentelemetry-collector
     container_name: otel-collector
+    depends_on:
+      - jaeger
     networks:
       - default
     command: ["--config=/etc/otel-collector-config.yml"]
     volumes:
       - ./open-telemetry/otel-collector-config.yml:/etc/otel-collector-config.yml:ro
-    depends_on:
-      - jaeger
 
   jaeger:
     image: jaegertracing/all-in-one
@@ -84,19 +93,12 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    depends_on:
+      - otel-collector
     networks:
       - default
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-
-  loki:
-    image: grafana/loki
-    container_name: loki
-    networks:
-      - default
-    command: -config.file=/etc/loki/local-config.yml
-    volumes:
-      - ./loki/loki-config.yml:/etc/loki/local-config.yml
 
   promtail:
     image: grafana/promtail
@@ -111,9 +113,22 @@ services:
     depends_on:
       - loki
 
+  loki:
+    image: grafana/loki
+    container_name: loki
+    networks:
+      - default
+    command: -config.file=/etc/loki/local-config.yml
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yml
+
   grafana:
     image: grafana/grafana
     container_name: grafana
+    depends_on:
+      - prometheus
+      - jaeger
+      - loki
     networks:
       - default
     ports:
@@ -123,7 +138,3 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-    depends_on:
-      - prometheus
-      - jaeger
-      - loki
