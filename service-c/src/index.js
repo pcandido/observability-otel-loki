@@ -2,8 +2,6 @@ const Queue = require('bull')
 const logger = require('./logger')
 const { metrics } = require('@opentelemetry/api')
 
-require('./open-telemetry')
-
 const queueName = process.env.QUEUE_NAME ?? 'service-c-queue'
 const redisHost = process.env.REDIS_HOST ?? 'localhost'
 const redisPort = process.env.REDIS_PORT ?? 6379

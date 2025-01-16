@@ -3,8 +3,6 @@ const axios = require('axios')
 const Queue = require('bull')
 const logger = require('./logger')
 
-require('./open-telemetry')
-
 const app = express()
 
 const PORT = process.env.PORT ?? 3000
@@ -36,7 +34,7 @@ app.get('/', async (req, res) => {
     logger.info('Response from Service B:', responseB.data)
 
     logger.info('Adding job to Service C queue', { number: responseB.data.number })
-    await serviceCQueue.add({ number: responseB.data.number, sleepTime: serviceCSleepTime })
+    await serviceCQueue.add({ number: responseB.data.number, sleepTime: serviceCSleepTime, createdAt: new Date().getTime() })
 
     res.send({ message: 'Service A completed request' })
   } catch (error) {
