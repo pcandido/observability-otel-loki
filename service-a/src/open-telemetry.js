@@ -18,6 +18,7 @@ const sdk = new NodeSDK({
   traceExporter: traceExporter,
   metricReader: new PeriodicExportingMetricReader({
     exporter: metricExporter,
+    exportIntervalMillis: 5000,
   }),
   instrumentations: [getNodeAutoInstrumentations()],
 })
