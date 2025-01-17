@@ -17,11 +17,11 @@ const serviceCQueue = new Queue(queueName, {
 
 app.get('/', async (req, res) => {
   try {
-    logger.info('Service A processing request...')
-
     const serviceASleepTime = parseInt(req.query.service_a_sleep_time) || 0
     const serviceBSleepTime = parseInt(req.query.service_b_sleep_time) || 0
     const serviceCSleepTime = parseInt(req.query.service_c_sleep_time) || 0
+
+    logger.info('Service A processing request...', {serviceASleepTime, serviceBSleepTime, serviceCSleepTime})
 
     if (serviceASleepTime > 0) {
       await new Promise(res => setTimeout(res, serviceASleepTime))
